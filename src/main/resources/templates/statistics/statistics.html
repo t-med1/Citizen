@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Statistiques — CitizenConnect</title>
+    <th:block th:replace="~{fragments/common :: stylesheets}"></th:block>
+</head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div class="app-shell">
+    <aside th:replace="~{fragments/common :: sidebar}"></aside>
+    <main class="app-content">
+        <h3 class="mb-1">Statistiques</h3>
+        <p class="text-muted mb-4">Analyse globale de l'activité de la plateforme.</p>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="stat-card bg-navy">
+                    <i class="bi bi-people"></i>
+                    <div class="stat-value" th:text="${stats.totalUsers}">0</div>
+                    <div class="stat-label">Utilisateurs</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card bg-teal">
+                    <i class="bi bi-card-checklist"></i>
+                    <div class="stat-value" th:text="${stats.totalComplaints}">0</div>
+                    <div class="stat-label">Réclamations</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card bg-amber">
+                    <i class="bi bi-tags"></i>
+                    <div class="stat-value" th:text="${stats.totalCategories}">0</div>
+                    <div class="stat-label">Catégories</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card bg-green">
+                    <i class="bi bi-person-badge"></i>
+                    <div class="stat-value" th:text="${stats.totalAgents}">0</div>
+                    <div class="stat-label">Agents</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header">Répartition par statut</div>
+                    <div class="table-responsive">
+                        <table class="table table-app mb-0">
+                            <thead><tr><th>Statut</th><th>Nombre</th><th>Part</th></tr></thead>
+                            <tbody>
+                            <tr th:each="entry : ${stats.complaintsByStatus}">
+                                <td><span class="badge-status" th:classappend="'status-' + ${entry.key}" th:text="${entry.key}">STATUT</span></td>
+                                <td th:text="${entry.value}">0</td>
+                                <td class="small text-muted"
+                                    th:text="${stats.totalComplaints > 0 ? #numbers.formatDecimal(entry.value * 100.0 / stats.totalComplaints, 1, 1) + '%' : '0%'}">0%</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header">Répartition par catégorie</div>
+                    <div class="table-responsive">
+                        <table class="table table-app mb-0">
+                            <thead><tr><th>Catégorie</th><th>Nombre</th><th>Part</th></tr></thead>
+                            <tbody>
+                            <tr th:each="entry : ${stats.complaintsByCategory}">
+                                <td th:text="${entry.key}">Catégorie</td>
+                                <td th:text="${entry.value}">0</td>
+                                <td class="small text-muted"
+                                    th:text="${stats.totalComplaints > 0 ? #numbers.formatDecimal(entry.value * 100.0 / stats.totalComplaints, 1, 1) + '%' : '0%'}">0%</td>
+                            </tr>
+                            <tr th:if="${#maps.isEmpty(stats.complaintsByCategory)}">
+                                <td colspan="3"><div class="empty-state">Aucune donnée</div></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<th:block th:replace="~{fragments/common :: scripts}"></th:block>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Connexion — CitizenConnect</title>
+    <th:block th:replace="~{fragments/common :: stylesheets}"></th:block>
+</head>
+<body>
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-brand">
+            <i class="bi bi-building-check"></i>
+            <span class="brand-font fs-4">CitizenConnect</span>
+        </div>
+        <h5 class="mb-1">Connexion</h5>
+        <p class="text-muted small mb-4">Accédez à votre espace citoyen, agent ou administrateur.</p>
+
+        <div th:if="${param.error}" class="alert alert-danger py-2 small">
+            <i class="bi bi-exclamation-triangle me-1"></i> Email ou mot de passe incorrect.
+        </div>
+        <div th:if="${param.logout}" class="alert alert-success py-2 small">
+            <i class="bi bi-check-circle me-1"></i> Vous avez été déconnecté avec succès.
+        </div>
+        <div th:if="${param.expired}" class="alert alert-warning py-2 small">
+            Votre session a expiré, merci de vous reconnecter.
+        </div>
+        <div th:if="${successMessage}" class="alert alert-success py-2 small" th:text="${successMessage}"></div>
+
+        <form th:action="@{/login}" method="post">
+            <div class="mb-3">
+                <label class="form-label">Adresse email</label>
+                <input type="email" name="username" class="form-control" placeholder="vous@exemple.com" required autofocus>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Mot de passe</label>
+                <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Se connecter</button>
+        </form>
+
+        <hr class="my-4">
+        <p class="text-center small mb-1">Pas encore de compte ?
+            <a th:href="@{/register}">Créer un compte citoyen</a>
+        </p>
+
+        <div class="mt-4 p-3 rounded-3" style="background: var(--slate-100);">
+            <p class="small fw-semibold mb-1">Comptes de démonstration</p>
+            <p class="small text-muted mb-0 ref-code" th:each="acc : ${demoAccounts}"
+            th:text="${acc.email + ' / ' + acc.demoPasswordHint}">
+            </p>
+        </div>
+    </div>
+</div>
+<th:block th:replace="~{fragments/common :: scripts}"></th:block>
+</body>
+</html>

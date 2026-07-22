@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Réclamations — CitizenConnect</title>
+    <th:block th:replace="~{fragments/common :: stylesheets}"></th:block>
+</head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div class="app-shell">
+    <aside th:replace="~{fragments/common :: sidebar}"></aside>
+    <main class="app-content">
+        <div th:replace="~{fragments/common :: flash-messages}"></div>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="mb-1">Réclamations</h3>
+                <p class="text-muted mb-0" sec:authorize="hasRole('ADMIN')">Toutes les réclamations de la plateforme.</p>
+                <p class="text-muted mb-0" sec:authorize="hasRole('AGENT')">Réclamations qui vous sont assignées.</p>
+                <p class="text-muted mb-0" sec:authorize="hasRole('CITIZEN')">Vos réclamations soumises.</p>
+            </div>
+            <a sec:authorize="hasRole('CITIZEN')" th:href="@{/complaints/new}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Nouvelle réclamation
+            </a>
+        </div>
+
+        <form th:action="@{/complaints}" method="get" class="row g-2 mb-3">
+            <div class="col-md-5">
+                <input type="text" name="keyword" th:value="${keyword}" class="form-control" placeholder="Rechercher par titre...">
+            </div>
+            <div class="col-md-4">
+                <select name="status" class="form-select">
+                    <option value="">Tous les statuts</option>
+                    <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}"
+                            th:selected="${selectedStatus != null and selectedStatus == s}">STATUT</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-outline-primary w-100"><i class="bi bi-search"></i> Filtrer</button>
+            </div>
+        </form>
+
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table table-app mb-0">
+                    <thead>
+                    <tr>
+                        <th>Réf.</th><th>Titre</th><th>Catégorie</th>
+                        <th sec:authorize="hasAnyRole('ADMIN')">Citoyen</th>
+                        <th sec:authorize="hasAnyRole('ADMIN','CITIZEN')">Agent</th>
+                        <th>Statut</th><th>Date</th><th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="c : ${complaints}">
+                        <td class="ref-code small">#<span th:text="${c.id}">1</span></td>
+                        <td><a th:href="@{'/complaints/' + ${c.id}}" th:text="${c.title}">Titre</a></td>
+                        <td th:text="${c.categoryName}">Catégorie</td>
+                        <td sec:authorize="hasAnyRole('ADMIN')" th:text="${c.citizenName}">Citoyen</td>
+                        <td sec:authorize="hasAnyRole('ADMIN','CITIZEN')" th:text="${c.assignedAgentName} ?: 'Non assigné'">Agent</td>
+                        <td><span class="badge-status" th:classappend="'status-' + ${c.status}" th:text="${c.status}">STATUT</span></td>
+                        <td class="small text-muted" th:text="${#temporals.format(c.createdAt, 'dd/MM/yyyy')}">01/01/2026</td>
+                        <td><a th:href="@{'/complaints/' + ${c.id}}" class="btn btn-sm btn-outline-primary">Détails</a></td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(complaints)}">
+                        <td colspan="8"><div class="empty-state"><i class="bi bi-card-checklist"></i> Aucune réclamation trouvée</div></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+<th:block th:replace="~{fragments/common :: scripts}"></th:block>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${isEdit} ? 'Modifier rôle — CitizenConnect' : 'Nouveau rôle — CitizenConnect'">Rôle</title>
+    <th:block th:replace="~{fragments/common :: stylesheets}"></th:block>
+</head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div class="app-shell">
+    <aside th:replace="~{fragments/common :: sidebar}"></aside>
+    <main class="app-content">
+        <h3 class="mb-4" th:text="${isEdit} ? 'Modifier le rôle' : 'Nouveau rôle'">Formulaire</h3>
+        <div class="card" style="max-width: 560px;">
+            <div class="card-body">
+                <form th:action="${isEdit} ? @{'/roles/' + ${roleId}} : @{/roles}" th:object="${roleDTO}" method="post">
+                    <div class="mb-3">
+                        <label class="form-label">Nom du rôle</label>
+                        <input type="text" th:field="*{name}" class="form-control" placeholder="ROLE_XXXX"
+                               th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'">
+                        <div class="form-text">Doit respecter le format ROLE_XXXX, ex. ROLE_SUPERVISOR</div>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Description</label>
+                        <textarea th:field="*{description}" class="form-control" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                    <a th:href="@{/roles}" class="btn btn-outline-secondary">Annuler</a>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+<th:block th:replace="~{fragments/common :: scripts}"></th:block>
+</body>
+</html>

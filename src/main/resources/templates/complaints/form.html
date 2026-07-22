@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Nouvelle réclamation — CitizenConnect</title>
+    <th:block th:replace="~{fragments/common :: stylesheets}"></th:block>
+</head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div class="app-shell">
+    <aside th:replace="~{fragments/common :: sidebar}"></aside>
+    <main class="app-content">
+        <h3 class="mb-1">Déposer une réclamation</h3>
+        <p class="text-muted mb-4">Décrivez le problème rencontré ; un agent municipal la traitera dans les meilleurs délais.</p>
+
+        <div class="card" style="max-width: 680px;">
+            <div class="card-body">
+                <form th:action="@{/complaints}" th:object="${complaintDTO}" method="post">
+                    <div class="mb-3">
+                        <label class="form-label">Titre</label>
+                        <input type="text" th:field="*{title}" class="form-control" placeholder="Résumé bref du problème"
+                               th:classappend="${#fields.hasErrors('title')} ? 'is-invalid'">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Catégorie</label>
+                        <select th:field="*{categoryId}" class="form-select" th:classappend="${#fields.hasErrors('categoryId')} ? 'is-invalid'">
+                            <option value="">— Sélectionner —</option>
+                            <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}">Catégorie</option>
+                        </select>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('categoryId')}" th:errors="*{categoryId}"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Lieu concerné</label>
+                        <input type="text" th:field="*{location}" class="form-control" placeholder="Adresse, quartier, point de repère...">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Description détaillée</label>
+                        <textarea th:field="*{description}" class="form-control" rows="5"
+                                  th:classappend="${#fields.hasErrors('description')} ? 'is-invalid'"
+                                  placeholder="Décrivez le problème avec le plus de détails possible..."></textarea>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-send"></i> Soumettre</button>
+                    <a th:href="@{/complaints}" class="btn btn-outline-secondary">Annuler</a>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+<th:block th:replace="~{fragments/common :: scripts}"></th:block>
+</body>
+</html>

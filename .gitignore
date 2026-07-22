@@ -1,0 +1,23 @@
+target/
+*.class
+
+# IDE
+.idea/
+*.iml
+*.iws
+.vscode/
+.settings/
+.classpath
+.project
+bin/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Uploaded attachments (dev storage)
+src/main/resources/static/uploads/*
+!src/main/resources/static/uploads/.gitkeep

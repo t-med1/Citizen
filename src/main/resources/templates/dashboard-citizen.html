@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tableau de bord — CitizenConnect</title>
+    <th:block th:replace="~{fragments/common :: stylesheets}"></th:block>
+</head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div class="app-shell">
+    <aside th:replace="~{fragments/common :: sidebar}"></aside>
+    <main class="app-content">
+        <div th:replace="~{fragments/common :: flash-messages}"></div>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="mb-1">Bonjour, <span th:text="${currentUser.fullName}">Citoyen</span></h3>
+                <p class="text-muted mb-0">Suivez ici l'état de vos réclamations.</p>
+            </div>
+            <a th:href="@{/complaints/new}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Nouvelle réclamation</a>
+        </div>
+
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table table-app mb-0">
+                    <thead>
+                    <tr><th>Réf.</th><th>Titre</th><th>Catégorie</th><th>Statut</th><th>Agent</th><th>Date</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="c : ${myComplaints}">
+                        <td class="ref-code small">#<span th:text="${c.id}">1</span></td>
+                        <td><a th:href="@{'/complaints/' + ${c.id}}" th:text="${c.title}">Titre</a></td>
+                        <td th:text="${c.categoryName}">Catégorie</td>
+                        <td><span class="badge-status" th:classappend="'status-' + ${c.status}" th:text="${c.status}">STATUT</span></td>
+                        <td class="small text-muted" th:text="${c.assignedAgentName} ?: 'Non assigné'">Agent</td>
+                        <td class="small text-muted" th:text="${#temporals.format(c.createdAt, 'dd/MM/yyyy')}">01/01/2026</td>
+                        <td><a th:href="@{'/complaints/' + ${c.id}}" class="btn btn-sm btn-outline-primary">Détails</a></td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(myComplaints)}">
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <i class="bi bi-inbox"></i>
+                                Vous n'avez soumis aucune réclamation.
+                                <div class="mt-2"><a th:href="@{/complaints/new}" class="btn btn-sm btn-primary">Déposer ma première réclamation</a></div>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+<th:block th:replace="~{fragments/common :: scripts}"></th:block>
+</body>
+</html>

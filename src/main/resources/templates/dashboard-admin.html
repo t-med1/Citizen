@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tableau de bord — CitizenConnect</title>
+    <th:block th:replace="~{fragments/common :: stylesheets}"></th:block>
+</head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div class="app-shell">
+    <aside th:replace="~{fragments/common :: sidebar}"></aside>
+    <main class="app-content">
+        <div th:replace="~{fragments/common :: flash-messages}"></div>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="mb-0">Tableau de bord administrateur</h3>
+                <p class="text-muted mb-0">Vue d'ensemble de la plateforme, <span th:text="${currentUser.fullName}">Admin</span></p>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="stat-card bg-navy">
+                    <i class="bi bi-people"></i>
+                    <div class="stat-value" th:text="${stats.totalUsers}">0</div>
+                    <div class="stat-label">Utilisateurs</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card bg-teal">
+                    <i class="bi bi-card-checklist"></i>
+                    <div class="stat-value" th:text="${stats.totalComplaints}">0</div>
+                    <div class="stat-label">Réclamations</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card bg-amber">
+                    <i class="bi bi-tags"></i>
+                    <div class="stat-value" th:text="${stats.totalCategories}">0</div>
+                    <div class="stat-label">Catégories</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card bg-green">
+                    <i class="bi bi-person-badge"></i>
+                    <div class="stat-value" th:text="${stats.totalAgents}">0</div>
+                    <div class="stat-label">Agents</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header">Réclamations par statut</div>
+                    <div class="card-body">
+                        <div th:each="entry : ${stats.complaintsByStatus}" class="d-flex align-items-center mb-2">
+                            <span class="badge-status me-2" th:classappend="'status-' + ${entry.key}" th:text="${entry.key}" style="min-width:130px; display:inline-block;">STATUT</span>
+                            <div class="progress flex-grow-1" style="height: 8px;">
+                                <div class="progress-bar" role="progressbar"
+                                     th:style="'width:' + ${stats.totalComplaints > 0 ? (entry.value * 100 / stats.totalComplaints) : 0} + '%; background: var(--teal-600);'"></div>
+                            </div>
+                            <span class="ms-2 small fw-semibold" th:text="${entry.value}">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header">Réclamations par catégorie</div>
+                    <div class="card-body">
+                        <div th:if="${#maps.isEmpty(stats.complaintsByCategory)}" class="empty-state py-3">
+                            <span class="small">Aucune donnée pour le moment</span>
+                        </div>
+                        <div th:each="entry : ${stats.complaintsByCategory}" class="d-flex align-items-center mb-2">
+                            <span class="small text-truncate me-2" style="min-width:130px;" th:text="${entry.key}">Catégorie</span>
+                            <div class="progress flex-grow-1" style="height: 8px;">
+                                <div class="progress-bar" role="progressbar"
+                                     th:style="'width:' + ${stats.totalComplaints > 0 ? (entry.value * 100 / stats.totalComplaints) : 0} + '%; background: var(--amber-500);'"></div>
+                            </div>
+                            <span class="ms-2 small fw-semibold" th:text="${entry.value}">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-7">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between">
+                        Réclamations récentes
+                        <a th:href="@{/complaints}" class="small">Voir tout</a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-app mb-0">
+                            <thead><tr><th>Titre</th><th>Citoyen</th><th>Statut</th><th>Date</th></tr></thead>
+                            <tbody>
+                            <tr th:each="c : ${stats.recentComplaints}">
+                                <td><a th:href="@{'/complaints/' + ${c.id}}" th:text="${c.title}">Titre</a></td>
+                                <td th:text="${c.citizenName}">Citoyen</td>
+                                <td><span class="badge-status" th:classappend="'status-' + ${c.status}" th:text="${c.status}">STATUT</span></td>
+                                <td class="small text-muted" th:text="${#temporals.format(c.createdAt, 'dd/MM/yyyy')}">01/01/2026</td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(stats.recentComplaints)}">
+                                <td colspan="4" class="empty-state">Aucune réclamation pour le moment</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between">
+                        Nouveaux utilisateurs
+                        <a th:href="@{/users}" class="small">Voir tout</a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-app mb-0">
+                            <thead><tr><th>Nom</th><th>Rôles</th></tr></thead>
+                            <tbody>
+                            <tr th:each="u : ${stats.recentUsers}">
+                                <td>
+                                    <div th:text="${u.fullName}">Nom</div>
+                                    <div class="small text-muted" th:text="${u.email}">email</div>
+                                </td>
+                                <td><span class="badge bg-light text-dark" th:each="r : ${u.roleNames}" th:text="${r}">ROLE</span></td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(stats.recentUsers)}">
+                                <td colspan="2" class="empty-state">Aucun utilisateur récent</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<th:block th:replace="~{fragments/common :: scripts}"></th:block>
+</body>
+</html>

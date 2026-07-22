@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${complaint.title} + ' — CitizenConnect'">Réclamation</title>
+    <th:block th:replace="~{fragments/common :: stylesheets}"></th:block>
+</head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div class="app-shell">
+    <aside th:replace="~{fragments/common :: sidebar}"></aside>
+    <main class="app-content">
+        <div th:replace="~{fragments/common :: flash-messages}"></div>
+
+        <nav aria-label="breadcrumb" class="small mb-2">
+            <a th:href="@{/complaints}">Réclamations</a> <span class="text-muted">/ #<span th:text="${complaint.id}">1</span></span>
+        </nav>
+
+        <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+                <h3 class="mb-1" th:text="${complaint.title}">Titre de la réclamation</h3>
+                <p class="text-muted mb-0">
+                    <i class="bi bi-tag"></i> <span th:text="${complaint.categoryName}">Catégorie</span>
+                    <span th:if="${complaint.location}"> · <i class="bi bi-geo-alt"></i> <span th:text="${complaint.location}">Lieu</span></span>
+                </p>
+            </div>
+            <form sec:authorize="hasRole('ADMIN')" th:action="@{'/complaints/' + ${complaint.id} + '/delete'}" method="post"
+                  data-confirm="Supprimer définitivement cette réclamation ?">
+                <button type="submit" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i> Supprimer</button>
+            </form>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <div th:if="${complaint.status.name() != 'REJECTED'}" class="status-stepper">
+                    <div class="step" th:classappend="${complaint.status.ordinal() > 0} ? 'done' : (${complaint.status.ordinal() == 0} ? 'current' : '')">
+                        <div class="dot"><i class="bi bi-file-earmark-plus"></i></div>
+                        <div class="label">Nouvelle</div>
+                    </div>
+                    <div class="step" th:classappend="${complaint.status.ordinal() > 1} ? 'done' : (${complaint.status.ordinal() == 1} ? 'current' : '')">
+                        <div class="dot"><i class="bi bi-gear"></i></div>
+                        <div class="label">En cours</div>
+                    </div>
+                    <div class="step" th:classappend="${complaint.status.ordinal() > 2} ? 'done' : (${complaint.status.ordinal() == 2} ? 'current' : '')">
+                        <div class="dot"><i class="bi bi-hourglass-split"></i></div>
+                        <div class="label">En attente</div>
+                    </div>
+                    <div class="step" th:classappend="${complaint.status.ordinal() > 3} ? 'done' : (${complaint.status.ordinal() == 3} ? 'current' : '')">
+                        <div class="dot"><i class="bi bi-check2"></i></div>
+                        <div class="label">Résolue</div>
+                    </div>
+                    <div class="step" th:classappend="${complaint.status.ordinal() == 4} ? 'current' : ''">
+                        <div class="dot"><i class="bi bi-lock"></i></div>
+                        <div class="label">Clôturée</div>
+                    </div>
+                </div>
+                <div th:if="${complaint.status.name() == 'REJECTED'}" class="alert alert-danger mb-0">
+                    <i class="bi bi-x-circle"></i> Cette réclamation a été <strong>rejetée</strong>.
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-8">
+                <div class="card mb-3">
+                    <div class="card-header">Description</div>
+                    <div class="card-body">
+                        <p class="mb-0" th:text="${complaint.description}">Description détaillée</p>
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-header">Pièces jointes</div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush mb-3" th:if="${not #lists.isEmpty(attachments)}">
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0" th:each="a : ${attachments}">
+                                <span><i class="bi bi-paperclip"></i> <span th:text="${a.fileName}">fichier.pdf</span></span>
+                                <span>
+                                    <a th:href="@{'/attachments/' + ${a.id} + '/download'}" class="btn btn-sm btn-outline-primary"><i class="bi bi-download"></i></a>
+                                    <form th:action="@{'/attachments/' + ${a.id} + '/delete'}" method="post" class="d-inline" data-confirm="Supprimer cette pièce jointe ?">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                </span>
+                            </li>
+                        </ul>
+                        <p th:if="${#lists.isEmpty(attachments)}" class="text-muted small mb-3">Aucune pièce jointe pour le moment.</p>
+
+                        <form th:action="@{'/complaints/' + ${complaint.id} + '/attachments'}" method="post" enctype="multipart/form-data" class="d-flex gap-2">
+                            <input type="file" name="file" class="form-control form-control-sm" required>
+                            <button type="submit" class="btn btn-sm btn-outline-primary text-nowrap"><i class="bi bi-upload"></i> Ajouter</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Commentaires</div>
+                    <div class="card-body">
+                        <div th:if="${#lists.isEmpty(comments)}" class="text-muted small mb-3">Aucun commentaire pour le moment.</div>
+                        <div class="comment-bubble" th:each="cm : ${comments}">
+                            <div class="meta"><strong th:text="${cm.authorName}">Auteur</strong> · <span th:text="${#temporals.format(cm.createdAt, 'dd/MM/yyyy HH:mm')}">date</span></div>
+                            <div th:text="${cm.content}">Contenu du commentaire</div>
+                        </div>
+
+                        <form sec:authorize="hasAnyRole('AGENT','ADMIN')" th:action="@{'/complaints/' + ${complaint.id} + '/comments'}" method="post" class="mt-3">
+                            <textarea name="content" class="form-control mb-2" rows="2" placeholder="Ajouter un commentaire..." required></textarea>
+                            <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-chat-left-text"></i> Publier</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card mb-3">
+                    <div class="card-header">Informations</div>
+                    <div class="card-body small">
+                        <p class="mb-2"><strong>Statut :</strong>
+                            <span class="badge-status" th:classappend="'status-' + ${complaint.status}" th:text="${complaint.status}">STATUT</span>
+                        </p>
+                        <p class="mb-2"><strong>Citoyen :</strong> <span th:text="${complaint.citizenName}">Citoyen</span></p>
+                        <p class="mb-2"><strong>Agent assigné :</strong> <span th:text="${complaint.assignedAgentName} ?: 'Non assigné'">Agent</span></p>
+                        <p class="mb-2"><strong>Créée le :</strong> <span th:text="${#temporals.format(complaint.createdAt, 'dd/MM/yyyy HH:mm')}">date</span></p>
+                        <p class="mb-0"><strong>Mise à jour :</strong> <span th:text="${#temporals.format(complaint.updatedAt, 'dd/MM/yyyy HH:mm')}">date</span></p>
+                    </div>
+                </div>
+
+                <div class="card" sec:authorize="hasAnyRole('AGENT','ADMIN')">
+                    <div class="card-header">Traitement</div>
+                    <div class="card-body">
+                        <form th:action="@{'/complaints/' + ${complaint.id} + '/status'}" method="post">
+                            <div class="mb-3">
+                                <label class="form-label">Statut</label>
+                                <select name="status" class="form-select">
+                                    <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}"
+                                            th:selected="${s == complaint.status}">STATUT</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Assigner à un agent</label>
+                                <select name="assignedAgentId" class="form-select">
+                                    <option value="">— Ne pas modifier —</option>
+                                    <option th:each="a : ${agents}" th:value="${a.id}" th:text="${a.fullName}"
+                                            th:selected="${complaint.assignedAgentId != null and complaint.assignedAgentId == a.id}">Agent</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100"><i class="bi bi-check2-square"></i> Mettre à jour</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<th:block th:replace="~{fragments/common :: scripts}"></th:block>
+</body>
+</html>

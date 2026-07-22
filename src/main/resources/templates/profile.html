@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mon profil — CitizenConnect</title>
+    <th:block th:replace="~{fragments/common :: stylesheets}"></th:block>
+</head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div class="app-shell">
+    <aside th:replace="~{fragments/common :: sidebar}"></aside>
+    <main class="app-content">
+        <div th:replace="~{fragments/common :: flash-messages}"></div>
+
+        <h3 class="mb-4">Mon profil</h3>
+
+        <div class="row g-3">
+            <div class="col-md-7">
+                <div class="card">
+                    <div class="card-header">Informations personnelles</div>
+                    <div class="card-body">
+                        <form th:action="@{/profile}" th:object="${profileUpdateDTO}" method="post">
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" th:value="${currentUser.email}" disabled>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Nom complet</label>
+                                <input type="text" th:field="*{fullName}" class="form-control"
+                                       th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid'">
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Téléphone</label>
+                                    <input type="text" th:field="*{phone}" class="form-control">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Adresse</label>
+                                    <input type="text" th:field="*{address}" class="form-control">
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+                            <p class="fw-semibold mb-3">Changer de mot de passe <span class="text-muted fw-normal small">(optionnel)</span></p>
+                            <div class="mb-3">
+                                <label class="form-label">Mot de passe actuel</label>
+                                <input type="password" th:field="*{currentPassword}" class="form-control"
+                                       th:classappend="${#fields.hasErrors('currentPassword')} ? 'is-invalid'">
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('currentPassword')}" th:errors="*{currentPassword}"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Nouveau mot de passe</label>
+                                    <input type="password" th:field="*{newPassword}" class="form-control"
+                                           th:classappend="${#fields.hasErrors('newPassword')} ? 'is-invalid'">
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('newPassword')}" th:errors="*{newPassword}"></div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Confirmer</label>
+                                    <input type="password" th:field="*{confirmNewPassword}" class="form-control">
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary mt-2">Enregistrer les modifications</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div class="card">
+                    <div class="card-header">Compte</div>
+                    <div class="card-body small">
+                        <p class="mb-2"><strong>Rôles :</strong>
+                            <span class="badge bg-light text-dark me-1" th:each="r : ${currentUser.roles}" th:text="${#strings.replace(r.name,'ROLE_','')}">ROLE</span>
+                        </p>
+                        <p class="mb-0"><strong>Membre depuis :</strong> <span th:text="${#temporals.format(currentUser.createdAt, 'dd/MM/yyyy')}">date</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<th:block th:replace="~{fragments/common :: scripts}"></th:block>
+</body>
+</html>

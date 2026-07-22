@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Erreur — CitizenConnect</title>
+    <th:block th:replace="~{fragments/common :: stylesheets}"></th:block>
+</head>
+<body>
+<div class="error-wrapper">
+    <div>
+        <div class="error-code">500</div>
+        <h4 class="mt-3 mb-2">Une erreur s'est produite</h4>
+        <p class="text-white-50 mb-4" th:text="${message} ?: 'Une erreur inattendue s\'est produite. Merci de réessayer.'">Message</p>
+        <a th:href="@{/dashboard}" class="btn btn-primary"><i class="bi bi-house"></i> Retour au tableau de bord</a>
+    </div>
+</div>
+</body>
+</html>

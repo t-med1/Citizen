@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Rôles — CitizenConnect</title>
+    <th:block th:replace="~{fragments/common :: stylesheets}"></th:block>
+</head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div class="app-shell">
+    <aside th:replace="~{fragments/common :: sidebar}"></aside>
+    <main class="app-content">
+        <div th:replace="~{fragments/common :: flash-messages}"></div>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="mb-1">Rôles</h3>
+                <p class="text-muted mb-0">Rôles disponibles pour le contrôle d'accès (RBAC).</p>
+            </div>
+            <a th:href="@{/roles/new}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Nouveau rôle</a>
+        </div>
+
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table table-app mb-0">
+                    <thead><tr><th>Nom</th><th>Description</th><th>Utilisateurs</th><th class="text-end">Actions</th></tr></thead>
+                    <tbody>
+                    <tr th:each="r : ${roles}">
+                        <td><span class="ref-code fw-semibold" th:text="${r.name}">ROLE</span></td>
+                        <td th:text="${r.description} ?: '—'">Description</td>
+                        <td><span class="badge text-bg-light text-dark" th:text="${r.userCount}">0</span></td>
+                        <td class="text-end">
+                            <a th:href="@{'/roles/' + ${r.id} + '/edit'}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                            <form th:action="@{'/roles/' + ${r.id} + '/delete'}" method="post" class="d-inline"
+                                  data-confirm="Supprimer ce rôle ?">
+                                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(roles)}">
+                        <td colspan="4"><div class="empty-state"><i class="bi bi-shield-lock"></i> Aucun rôle</div></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+<th:block th:replace="~{fragments/common :: scripts}"></th:block>
+</body>
+</html>

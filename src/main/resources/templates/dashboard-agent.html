@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tableau de bord — CitizenConnect</title>
+    <th:block th:replace="~{fragments/common :: stylesheets}"></th:block>
+</head>
+<body>
+<nav th:replace="~{fragments/common :: navbar}"></nav>
+<div class="app-shell">
+    <aside th:replace="~{fragments/common :: sidebar}"></aside>
+    <main class="app-content">
+        <div th:replace="~{fragments/common :: flash-messages}"></div>
+
+        <h3 class="mb-1">Mes réclamations assignées</h3>
+        <p class="text-muted mb-4">Bienvenue, <span th:text="${currentUser.fullName}">Agent</span>. Voici les dossiers qui vous sont confiés.</p>
+
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table table-app mb-0">
+                    <thead>
+                    <tr><th>Réf.</th><th>Titre</th><th>Citoyen</th><th>Catégorie</th><th>Statut</th><th>Date</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="c : ${myComplaints}">
+                        <td class="ref-code small">#<span th:text="${c.id}">1</span></td>
+                        <td><a th:href="@{'/complaints/' + ${c.id}}" th:text="${c.title}">Titre</a></td>
+                        <td th:text="${c.citizenName}">Citoyen</td>
+                        <td th:text="${c.categoryName}">Catégorie</td>
+                        <td><span class="badge-status" th:classappend="'status-' + ${c.status}" th:text="${c.status}">STATUT</span></td>
+                        <td class="small text-muted" th:text="${#temporals.format(c.createdAt, 'dd/MM/yyyy')}">01/01/2026</td>
+                        <td><a th:href="@{'/complaints/' + ${c.id}}" class="btn btn-sm btn-outline-primary">Traiter</a></td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(myComplaints)}">
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <i class="bi bi-inbox"></i>
+                                Aucune réclamation ne vous est assignée pour le moment.
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+<th:block th:replace="~{fragments/common :: scripts}"></th:block>
+</body>
+</html>
